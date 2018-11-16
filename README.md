@@ -1,5 +1,5 @@
 # uMutex
-Platform Universal Mutex for the Zig language
+Platform Independant Mutex for the Zig language
 
 ---
 
