@@ -21,7 +21,7 @@ pub fn main() !void {
 
     std.os.time.sleep(3 * std.os.time.ns_per_s);
     
-    std.debug.warn("Using {} threads, the final value is: {}", threads.len, work.data);
+    std.debug.warn("Using {} threads, the final value is: {}\n", threads.len, work.data);
 }
 
 const Workdata = struct {
@@ -30,8 +30,8 @@ const Workdata = struct {
 };
 
 fn worker(work: *Workdata) void {
-    const lock = work.mutex.lockDelay(10 * std.os.time.millisecond);
-    defer work.mutex.unlock();
+    _ = work.mutex.lockDelay(10 * std.os.time.millisecond);
+    defer _ = work.mutex.unlock();
 
     work.data += 1;
 }

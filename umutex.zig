@@ -55,9 +55,10 @@ pub const Umutex = struct {
     }
 
     /// Atomically unlocks the mutex; no other checks are done
-    pub fn unlock(self: *Umutex) void {
+    pub fn unlock(self: *Umutex) Status {
         // If this assersion fails, then umutex was incorrectly unlocked earlier from somewhere else
         assert(self.atom.xchg(1) == 0);
+        return Status.Unlocked;
     }
 
     /// Atomically checks if mutex is locked or unlocked
@@ -79,7 +80,7 @@ test "uMutex lock, unlock, and peeking" {
 
     assert(mutex.lock() == Status.Locked);
     assert(mutex.peek() == Status.Locked);
-    mutex.unlock();
+    assert(mutex.unlock() == Status.Unlocked);
     assert(mutex.peek() == Status.Unlocked);
 }
 
@@ -129,8 +130,8 @@ const Context = struct {
 fn worker(ctx: *Context) void {
     var i: usize = 0;
     while (i != Context.incr_count) : (i += 1) {
-        const held = ctx.mutex.lockDelay(10 * time.millisecond);
-        defer ctx.mutex.unlock();
+        _ = ctx.mutex.lockDelay(10 * time.millisecond);
+        defer _ = ctx.mutex.unlock();
 
         ctx.data += 1;
     }
