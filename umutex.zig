@@ -56,7 +56,7 @@ pub const Umutex = struct {
 
     /// Atomically unlocks the mutex; no other checks are done
     pub fn unlock(self: *Umutex) void {
-        // If this assersion fails, then umutex was unlocked earlier from somewhere else
+        // If this assersion fails, then umutex was incorrectly unlocked earlier from somewhere else
         assert(self.atom.xchg(1) == 0);
     }
 
@@ -129,7 +129,7 @@ const Context = struct {
 fn worker(ctx: *Context) void {
     var i: usize = 0;
     while (i != Context.incr_count) : (i += 1) {
-        const held = ctx.mutex.lock();
+        const held = ctx.mutex.lockDelay(10 * time.millisecond);
         defer ctx.mutex.unlock();
 
         ctx.data += 1;
